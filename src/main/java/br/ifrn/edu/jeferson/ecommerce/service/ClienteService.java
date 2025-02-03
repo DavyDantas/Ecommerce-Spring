@@ -18,7 +18,9 @@ import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.ClienteMapper;
 import br.ifrn.edu.jeferson.ecommerce.mapper.PedidoMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.ClienteRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class ClienteService {
 
@@ -33,6 +35,7 @@ public class ClienteService {
 
     @Transactional
     public ClienteResponseDTO salvar(ClienteRequestDTO clienteDto) {
+        log.debug("Salvando cliente: {}", clienteDto.getNome());
         var cliente = clienteMapper.toEntity(clienteDto);
 
         if (clienteRepository.existsByEmail(cliente.getEmail())) {
@@ -61,6 +64,8 @@ public class ClienteService {
     @Transactional
     @CacheEvict(value = "clientesPage", allEntries = true)
     public ClienteResponseDTO atualizar(Long id, ClienteRequestDTO clienteDto) {
+        log.debug("Atualizando cliente: {}", clienteDto.getNome());
+
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Cliente não encontrado"));
 
@@ -81,6 +86,8 @@ public class ClienteService {
     @Transactional
     @CacheEvict(value = "clientesPage", allEntries = true)
     public void deletar(Long id) {
+        log.debug("Salvando cliente com id: {}", id);
+
         if (!clienteRepository.existsById(id)) {
             throw new BusinessException("Cliente não encontrado");
         }
