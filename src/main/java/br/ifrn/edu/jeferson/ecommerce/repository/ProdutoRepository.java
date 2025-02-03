@@ -1,0 +1,22 @@
+package br.ifrn.edu.jeferson.ecommerce.repository;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import br.ifrn.edu.jeferson.ecommerce.domain.Categoria;
+import br.ifrn.edu.jeferson.ecommerce.domain.Produto;
+@Repository
+public interface ProdutoRepository extends JpaRepository<Produto, Long>, JpaSpecificationExecutor<Produto>{
+    
+    @SuppressWarnings("null")
+    @Override
+    Page<Produto> findAll(@SuppressWarnings("rawtypes") Specification filter,Pageable pageable);
+
+    List<Produto> findByCategorias(Categoria categoria);
+}

@@ -1,0 +1,12 @@
+<caffeine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://caffeine.cache.org/schema/caffeine.xsd">
+
+    <cache name="defaultCache"
+           maximumSize="1000"
+           expireAfterAccess="600s"
+           expireAfterWrite="1200s"/>
+
+    <cache name="clientesPage"
+           maximumSize="200"
+           expireAfterWrite="600s"/>
+</caffeine>
