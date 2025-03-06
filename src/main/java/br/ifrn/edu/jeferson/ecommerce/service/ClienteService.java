@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.ifrn.edu.jeferson.ecommerce.domain.Cliente;
+import br.ifrn.edu.jeferson.ecommerce.domain.enums.StatusPedido;
 import br.ifrn.edu.jeferson.ecommerce.dtos.cliente.ClienteRequestDTO;
 import br.ifrn.edu.jeferson.ecommerce.dtos.cliente.ClienteResponseDTO;
 import br.ifrn.edu.jeferson.ecommerce.dtos.pedidos.PedidoResponseDTO;
@@ -18,6 +19,7 @@ import br.ifrn.edu.jeferson.ecommerce.exception.BusinessException;
 import br.ifrn.edu.jeferson.ecommerce.mapper.ClienteMapper;
 import br.ifrn.edu.jeferson.ecommerce.mapper.PedidoMapper;
 import br.ifrn.edu.jeferson.ecommerce.repository.ClienteRepository;
+import br.ifrn.edu.jeferson.ecommerce.repository.PedidoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,7 +35,11 @@ public class ClienteService {
     @Autowired
     private PedidoMapper pedidoMapper;
 
+    @Autowired
+    private PedidoRepository pedidoRepository;
+
     @Transactional
+    @CacheEvict(value = "clientesPage", allEntries = true)
     public ClienteResponseDTO salvar(ClienteRequestDTO clienteDto) {
         log.debug("Salvando cliente: {}", clienteDto.getNome());
         var cliente = clienteMapper.toEntity(clienteDto);
@@ -86,11 +92,25 @@ public class ClienteService {
     @Transactional
     @CacheEvict(value = "clientesPage", allEntries = true)
     public void deletar(Long id) {
-        log.debug("Salvando cliente com id: {}", id);
-
+        
         if (!clienteRepository.existsById(id)) {
             throw new BusinessException("Cliente não encontrado");
         }
+        Cliente cliente = clienteRepository.findById(id)
+            .orElseThrow(() -> new BusinessException("Cliente não encontrado"));
+
+        boolean hasPendingOrders = cliente.getPedidos().stream()
+            .anyMatch(pedido -> pedido.getStatusPedido().equals(StatusPedido.AGUARDANDO));
+
+        if (hasPendingOrders) {
+            throw new BusinessException("Não é possivel deletar um cliente com pedidos em andamento");
+        }
+
+        cliente.getPedidos().forEach(pedido -> pedido.setCliente(null));
+        clienteRepository.save(cliente);
+        pedidoRepository.findByClienteId(id).forEach(pedidoRepository::delete);
+
+        log.debug("Deletando cliente com id: {}", id);
         clienteRepository.deleteById(id);
     }
 

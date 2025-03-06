@@ -46,8 +46,6 @@ public class PedidoService {
         pedido.setCliente(clienteRepository.findById(pedidoDto.getCliente())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado")));
 
-        
-
         pedidoRepository.save(pedido);
         return pedidoMapper.toResponseDTO(pedido);
     }
@@ -92,7 +90,7 @@ public class PedidoService {
     }
 
     public List<PedidoResponseDTO> buscarPedidosPorClienteId(Long clienteId) {
-        clienteRepository.findById(clienteId).orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
+        clienteRepository.findById(clienteId).orElseThrow(() -> new BusinessException("Cliente não encontrado"));
 
         List<Pedido> pedidos = pedidoRepository.findByClienteId(clienteId);
         return pedidoMapper.toDTOList(pedidos);
@@ -121,5 +119,13 @@ public class PedidoService {
             produto.setEstoque(produto.getEstoque() - item.getQuantidade());
             produtoRepository.save(produto);
         }
+    }
+
+    @Transactional
+    public void deletarPedido(Long id) {
+        pedidoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pedido não encontrado"));
+
+        pedidoRepository.deleteById(id);
     }
 }

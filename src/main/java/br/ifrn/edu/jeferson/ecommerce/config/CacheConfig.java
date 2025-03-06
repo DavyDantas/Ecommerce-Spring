@@ -17,8 +17,8 @@ public class CacheConfig {
     public CaffeineCacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager("clientesPage");
         cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterWrite(10, TimeUnit.MINUTES) // Expira após 10 min
-                .maximumSize(100)); // Máximo de 100 objetos no cache
+                .expireAfterWrite(10, TimeUnit.MINUTES) 
+                .maximumSize(100)); 
         return cacheManager;
     }
 }
