@@ -101,7 +101,7 @@ public class PedidoService {
             throw new BusinessException("Não é possível alterar o status de um pedido cancelado ou enviado");
         }
 
-        if (statusAtual == StatusPedido.AGUARDANDO && novoStatus != StatusPedido.PAGO) {
+        if (statusAtual == StatusPedido.AGUARDANDO && novoStatus == StatusPedido.ENVIADO) {
             throw new BusinessException("O pedido deve ser pago antes de ser enviado");
         }
 
